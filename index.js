@@ -62,7 +62,18 @@ async function run() {
       }
     });
 
- 
+     //  Find one by ID
+    const { ObjectId } = require('mongodb');
+    app.get("/foods/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await foodsCollection.findOne({ _id: new ObjectId(id) });
+        res.send(result);
+      } catch (error) {
+        console.error(" Error fetching by ID:", error);
+        res.status(500).send({ message: "Invalid ID" });
+      }
+    });
 
     await db.command({ ping: 1 });
     console.log("Pinged your deployment successfully.");
