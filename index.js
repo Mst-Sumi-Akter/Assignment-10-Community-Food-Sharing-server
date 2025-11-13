@@ -118,21 +118,26 @@ app.delete("/foods/:id", async (req, res) => {
   }
 });
 
-// PUT /foods/:id
+
+// PUT /foods/:id - Update food
 app.put("/foods/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const updatedData = req.body; // expects JSON with updated fields
+    const updatedFood = req.body;
+
+    // Only update the fields you want
     const result = await foodsCollection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: updatedData }
+      { $set: updatedFood }
     );
+
     res.send({ acknowledged: true, modifiedCount: result.modifiedCount });
   } catch (err) {
-    console.error(err);
+    console.error("Error updating food:", err);
     res.status(500).send({ message: "Failed to update food" });
   }
 });
+
 
 
     await db.command({ ping: 1 });
