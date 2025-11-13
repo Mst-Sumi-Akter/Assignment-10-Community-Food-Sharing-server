@@ -138,6 +138,47 @@ app.put("/foods/:id", async (req, res) => {
   }
 });
 
+// PATCH /foods/:id/request
+app.patch("/foods/:id/request", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { email } = req.body; // email of the user requesting the food
+
+    // Avoid overwriting if already requested
+    const food = await foodsCollection.findOne({ _id: new ObjectId(id) });
+    if (!food) return res.status(404).send({ message: "Food not found" });
+    if (food.requested_by_email === email)
+      return res.send({ acknowledged: true, modifiedCount: 0 });
+
+    const result = await foodsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { requested_by_email: email, food_status: "Requested" } }
+    );
+
+    res.send({ acknowledged: true, modifiedCount: result.modifiedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Failed to request food" });
+  }
+});
+
+// GET /food-requests using email
+app.get("/food-requests", async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) return res.status(400).send({ message: "Email required" });
+
+    // Find foods requested by this user
+    const requests = await foodsCollection
+      .find({ requested_by_email: userEmail })
+      .toArray();
+
+    res.send(requests);
+  } catch (err) {
+    console.error("Error fetching food requests:", err);
+    res.status(500).send({ message: "Failed to fetch your food requests" });
+  }
+});
 
 
     await db.command({ ping: 1 });
