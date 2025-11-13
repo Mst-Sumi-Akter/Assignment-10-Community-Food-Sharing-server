@@ -94,6 +94,47 @@ app.post("/add-food", async (req, res) => {
       }
     });
 
+    // GET /my-foods using email
+app.get("/my-foods", async (req, res) => {
+  try {
+    const email = req.query.email;
+    const foods = await foodsCollection.find({ donator_email: email }).toArray();
+    res.send(foods);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Failed to fetch your foods" });
+  }
+});
+
+// DELETE /foods/:id
+app.delete("/foods/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await foodsCollection.deleteOne({ _id: new ObjectId(id) });
+    res.send({ acknowledged: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Failed to delete food" });
+  }
+});
+
+// PUT /foods/:id
+app.put("/foods/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedData = req.body; // expects JSON with updated fields
+    const result = await foodsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updatedData }
+    );
+    res.send({ acknowledged: true, modifiedCount: result.modifiedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Failed to update food" });
+  }
+});
+
+
     await db.command({ ping: 1 });
     console.log("Pinged your deployment successfully.");
   } catch (error) {
