@@ -26,7 +26,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     // Use existing DB and collection
     const db = client.db("food-sharing-db");
@@ -181,7 +181,7 @@ app.get("/food-requests", async (req, res) => {
 });
 
 
-    await db.command({ ping: 1 });
+    // await db.command({ ping: 1 });
     console.log("Pinged your deployment successfully.");
   } catch (error) {
     console.error(" Error connecting to MongoDB:", error);
