@@ -75,6 +75,25 @@ async function run() {
       }
     });
 
+
+// Add food (expect donator_name, donator_email, donator_image from client)
+app.post("/add-food", async (req, res) => {
+      try {
+        const food = req.body;
+        food.food_status = food.food_status || "Available";
+        food.created_at = new Date();
+
+        const result = await foodsCollection.insertOne(food);
+        res.send({
+          acknowledged: true,
+          insertedId: result.insertedId,
+        });
+      } catch (err) {
+        console.error(" Add food error:", err);
+        res.status(500).send({ message: "Server error while adding food" });
+      }
+    });
+
     await db.command({ ping: 1 });
     console.log("Pinged your deployment successfully.");
   } catch (error) {
